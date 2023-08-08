@@ -27,3 +27,10 @@ document.getElementById('feedback_form').addEventListener('submit', function(eve
         this.querySelector('button').disabled = false
     }.bind(this))
 })
+
+var input = document.getElementById('input-service')
+document.querySelectorAll('.contact-link').forEach(function (el) {
+    el.addEventListener('click', function () {
+        input.value = this.getAttribute("data-value")
+    })
+})
