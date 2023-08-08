@@ -255,33 +255,33 @@
 
         <div class="row" data-aos="fade-in">
           <div class="align-items-stretch">
-            <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+            <form id="feedback_form" class="php-email-form">
               <div class="row">
                 <div class="form-group col-md-6">
-                  <label for="name">Ваше имя</label>
-                  <input type="text" name="name" class="form-control" id="name" required>
+                  <label for="input-name">Ваше имя</label>
+                  <input type="text" name="name" class="form-control" id="input-name" required>
                 </div>
                 <div class="form-group col-md-6">
-                  <label for="name">Ваш телефон</label>
-                  <input type="phone" class="form-control" name="phone" id="phone" required>
+                  <label for="input-phone">Ваш телефон</label>
+                  <input type="phone" class="form-control" name="phone" id="input-phone" required>
                 </div>
               </div>
               <div class="form-group">
-                <label for="name">Услуга</label>
-                <select class="form-select">
+                <label for="input-service">Услуга</label>
+                <select id="input-service" name="service" class="form-select">
                   <option selected>Не выбрано</option>
                   <option value="translate">Перевод</option>
                   <option value="trial">Пробное занятие</option>
                 </select>
               </div>
               <div class="form-group">
-                <label for="name">Сообщение (необязательно)</label>
-                <textarea class="form-control" name="message" rows="10"></textarea>
+                <label for="input-message">Сообщение (необязательно)</label>
+                <textarea id="input-message" class="form-control" name="message" rows="10"></textarea>
               </div>
               <div class="my-3">
-                <div class="loading">Loading</div>
-                <div class="error-message"></div>
-                <div class="sent-message">Your message has been sent. Thank you!</div>
+                <div class="loading">Загрузка...</div>
+                <div class="error-message">Что-то пошло не так. Пожалуйста, повторите попытку позднее или свяжитесь со мной удобным для вас способом</div>
+                <div class="sent-message">Ваше сообщение отправлено. Спасибо!</div>
               </div>
               <div class="text-center"><button type="submit">Отправить</button></div>
             </form>
@@ -325,6 +325,7 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/form.js"></script>
 
 </body>
 
