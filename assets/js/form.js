@@ -9,7 +9,7 @@ document.getElementById('feedback_form').addEventListener('submit', function(eve
         message: document.getElementById('input-message').value,
     }
 
-    fetch(window.location.host + ":6788", {
+    fetch('//' + window.location.host + ":6788", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
