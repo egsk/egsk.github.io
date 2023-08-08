@@ -1,5 +1,6 @@
 document.getElementById('feedback_form').addEventListener('submit', function(event) {
     event.preventDefault()
+    this.querySelector('button').disabled = true
     this.querySelector('.error-message').classList.remove('d-block')
     this.querySelector('.loading').classList.add('d-block')
     var request = {
@@ -23,9 +24,6 @@ document.getElementById('feedback_form').addEventListener('submit', function(eve
     }.bind(this)).catch(function () {
         this.querySelector('.loading').classList.remove('d-block')
         this.querySelector('.error-message').classList.add('d-block')
+        this.querySelector('button').disabled = false
     }.bind(this))
-    
-    
-    
-    console.log(request)
 })
