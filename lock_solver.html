@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gothic Lock Solver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --border: #2a2a2a;
+            --text-primary: #e8e8e8;
+            --text-secondary: #999;
+            --accent: #c0a080;
+            --accent-alt: #8b6f47;
+            --success: #6ba876;
+            --error: #a85d5d;
+            --gold: #d4af37;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0f0f0f 100%);
+            color: var(--text-primary);
+            font-family: 'Garamond', 'Georgia', serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(192, 160, 128, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 111, 71, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: normal;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            font-style: italic;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1100px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 30px;
+            animation: fadeInUp 0.8s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .panel h2 {
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: normal;
+        }
+
+        .pins-container {
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pins-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .pins-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .pins-container::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .pin-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            padding: 20px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .pin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .pin-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .pin-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            background: rgba(192, 160, 128, 0.2);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.2s ease;
+            border-radius: 2px;
+        }
+
+        .btn-small:hover {
+            background: var(--accent);
+            color: var(--dark-bg);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(192, 160, 128, 0.1);
+            box-shadow: 0 0 15px rgba(192, 160, 128, 0.2);
+        }
+
+        .relations-list {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .relation-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 2px;
+        }
+
+        .relation-item select {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .relation-item input {
+            width: 80px;
+        }
+
+        .add-relation {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .add-relation select, .add-relation input {
+            flex: 1;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 14px 20px;
+            background: var(--accent);
+            color: var(--dark-bg);
+            border: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Garamond', 'Georgia', serif;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            background: var(--accent-alt);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(192, 160, 128, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        button.secondary:hover {
+            background: rgba(192, 160, 128, 0.1);
+        }
+
+        .result-panel {
+            animation: slideInRight 0.5s ease;
+        }
+
+        .steps-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .steps-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .steps-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .steps-container::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--accent);
+            padding: 15px;
+            margin-bottom: 12px;
+            animation: stepSlide 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes stepSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step:nth-child(1) { animation-delay: 0.05s; }
+        .step:nth-child(2) { animation-delay: 0.1s; }
+        .step:nth-child(3) { animation-delay: 0.15s; }
+        .step:nth-child(4) { animation-delay: 0.2s; }
+        .step:nth-child(5) { animation-delay: 0.25s; }
+        .step:nth-child(n+6) { animation-delay: 0.3s; }
+
+        .step-number {
+            color: var(--accent);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-pin {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .step-arrow {
+            color: var(--text-secondary);
+            margin: 0 8px;
+        }
+
+        .state-array {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85em;
+            color: var(--accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            color: var(--accent);
+            font-weight: bold;
+            font-family: 'Monaco', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 30px;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(168, 93, 93, 0.2);
+            border: 1px solid var(--error);
+            color: #ff9999;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 2px;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .success-message {
+            background: rgba(107, 168, 118, 0.2);
+            border: 1px solid var(--success);
+            color: #99ff99;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 2px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .top-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .top-controls input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+
+        .empty-state button {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚔ Gothic Lock Solver</h1>
+            <p class="subtitle">Interactive Lock Picking Mechanic</p>
+        </header>
+
+        <div class="content">
+            <div class="panel">
+                <h2>Lock Configuration</h2>
+                
+                <div class="top-controls">
+                    <div style="flex: 1;">
+                        <label>Target Position</label>
+                        <input type="number" id="targetPosition" value="3" min="0" max="6">
+                    </div>
+                    <div style="flex: 0 0 auto; display: flex; align-items: flex-end;">
+                        <button class="secondary" onclick="addPin()" style="flex: 1; min-width: 120px;">+ Add Pin</button>
+                    </div>
+                </div>
+
+                <div id="pinsContainer" class="pins-container"></div>
+
+                <div class="button-group">
+                    <button onclick="solveLock()">Solve</button>
+                    <button class="secondary" onclick="loadExample()">Load Example</button>
+                    <button class="secondary" onclick="clearAll()">Clear All</button>
+                </div>
+            </div>
+
+            <div class="panel result-panel" id="resultPanel" style="display: none;">
+                <h2>Solution</h2>
+                <div id="resultContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <span>Computing solution...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============= LOCK SOLVER =============
+
+        class LockSolver {
+            constructor(pins, targetPosition = 3, minPos = 0, maxPos = 6) {
+                this.pins = pins;
+                this.targetPosition = targetPosition;
+                this.minPos = minPos;
+                this.maxPos = maxPos;
+                this.n = pins.length;
+            }
+
+            stateToString(state) {
+                return state.join(',');
+            }
+
+            isGoal(state) {
+                return state.every(pos => pos === this.targetPosition);
+            }
+
+            applyMove(state, pinIndex, delta) {
+                const newState = [...state];
+                
+                newState[pinIndex] += delta;
+                
+                if (newState[pinIndex] < this.minPos || newState[pinIndex] > this.maxPos) {
+                    return null;
+                }
+                
+                for (const relation of this.pins[pinIndex].relations) {
+                    const affectedPin = relation.pinIndex;
+                    const offsetDelta = delta * relation.positionOffsetOnMove;
+                    newState[affectedPin] += offsetDelta;
+                    
+                    if (newState[affectedPin] < this.minPos || newState[affectedPin] > this.maxPos) {
+                        return null;
+                    }
+                }
+                
+                return newState;
+            }
+
+            getNextStates(state) {
+                const nextStates = [];
+
+                for (let pinIndex = 0; pinIndex < this.n; pinIndex++) {
+                    for (const delta of [1, -1]) {
+                        const newState = this.applyMove(state, pinIndex, delta);
+                        
+                        if (newState !== null) {
+                            nextStates.push({ state: newState, movedPin: pinIndex, delta: delta });
+                        }
+                    }
+                }
+
+                return nextStates;
+            }
+
+            solve() {
+                const initialState = this.pins.map(pin => pin.initialPosition);
+
+                if (this.isGoal(initialState)) {
+                    return {
+                        found: true,
+                        moves: [],
+                        finalState: initialState,
+                        statesExplored: 1
+                    };
+                }
+
+                const queue = [{ state: initialState, path: [] }];
+                const visited = new Set([this.stateToString(initialState)]);
+                let statesExplored = 1;
+
+                while (queue.length > 0) {
+                    const { state, path } = queue.shift();
+
+                    const nextStates = this.getNextStates(state);
+
+                    for (const { state: nextState, movedPin, delta } of nextStates) {
+                        const stateStr = this.stateToString(nextState);
+
+                        if (visited.has(stateStr)) {
+                            continue;
+                        }
+
+                        statesExplored++;
+                        visited.add(stateStr);
+
+                        const newPath = [...path, { pin: movedPin, delta, fromState: state, toState: nextState }];
+
+                        if (this.isGoal(nextState)) {
+                            return {
+                                found: true,
+                                moves: newPath,
+                                finalState: nextState,
+                                statesExplored
+                            };
+                        }
+
+                        queue.push({ state: nextState, path: newPath });
+                    }
+                }
+
+                return {
+                    found: false,
+                    moves: null,
+                    statesExplored,
+                    message: 'No solution found'
+                };
+            }
+        }
+
+        // ============= STATE MANAGEMENT =============
+
+        let pins = [];
+
+        function addPin() {
+            pins.push({
+                id: Date.now(),
+                initialPosition: 0,
+                relations: []
+            });
+            renderPins();
+        }
+
+        function removePin(id) {
+            pins = pins.filter(p => p.id !== id);
+            pins.forEach(p => {
+                p.relations = p.relations.filter(r => r.id !== id);
+            });
+            renderPins();
+        }
+
+        function addRelation(pinId) {
+            const pin = pins.find(p => p.id === pinId);
+            if (pin) {
+                pin.relations.push({
+                    id: Date.now(),
+                    pinIndex: 0,
+                    positionOffsetOnMove: 1
+                });
+                renderPins();
+            }
+        }
+
+        function removeRelation(pinId, relationId) {
+            const pin = pins.find(p => p.id === pinId);
+            if (pin) {
+                pin.relations = pin.relations.filter(r => r.id !== relationId);
+                renderPins();
+            }
+        }
+
+        function updatePinPosition(id, value) {
+            const pin = pins.find(p => p.id === id);
+            if (pin) pin.initialPosition = parseInt(value) || 0;
+        }
+
+        function updateRelationPin(pinId, relationId, value) {
+            const pin = pins.find(p => p.id === pinId);
+            if (pin) {
+                const relation = pin.relations.find(r => r.id === relationId);
+                if (relation) relation.pinIndex = parseInt(value) || 0;
+            }
+        }
+
+        function updateRelationOffset(pinId, relationId, value) {
+            const pin = pins.find(p => p.id === pinId);
+            if (pin) {
+                const relation = pin.relations.find(r => r.id === relationId);
+                if (relation) relation.positionOffsetOnMove = parseInt(value) || 1;
+            }
+        }
+
+        function renderPins() {
+            const container = document.getElementById('pinsContainer');
+            
+            if (pins.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>No pins configured</p>
+                        <button class="secondary" onclick="addPin()">+ Add First Pin</button>
+                        <button class="secondary" onclick="loadExample()">Load Example</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = pins.map((pin, pinIndex) => `
+                <div class="pin-block">
+                    <div class="pin-header">
+                        <div class="pin-title">Pin ${pinIndex}</div>
+                        <div class="pin-controls">
+                            <button class="btn-small" onclick="addRelation(${pin.id})">+ Dep</button>
+                            <button class="btn-small" onclick="removePin(${pin.id})">Remove</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Initial Position</label>
+                        <input type="number" 
+                               value="${pin.initialPosition}" 
+                               min="0" max="6"
+                               onchange="updatePinPosition(${pin.id}, this.value)"
+                               oninput="updatePinPosition(${pin.id}, this.value)">
+                    </div>
+
+                    ${pin.relations.length > 0 ? `
+                        <div class="relations-list">
+                            <label style="margin-bottom: 10px; display: block; font-weight: bold;">Dependencies</label>
+                            ${pin.relations.map((rel, relIndex) => `
+                                <div class="relation-item">
+                                    <select onchange="updateRelationPin(${pin.id}, ${rel.id}, this.value)">
+                                        ${pins.map((p, i) => `
+                                            <option value="${i}" ${i === rel.pinIndex ? 'selected' : ''}>Pin ${i}</option>
+                                        `).join('')}
+                                    </select>
+                                    <input type="number" 
+                                           value="${rel.positionOffsetOnMove}" 
+                                           min="-6" max="6"
+                                           onchange="updateRelationOffset(${pin.id}, ${rel.id}, this.value)"
+                                           oninput="updateRelationOffset(${pin.id}, ${rel.id}, this.value)">
+                                    <button class="btn-small" onclick="removeRelation(${pin.id}, ${rel.id})">✕</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function loadExample() {
+            pins = [
+                { id: 1, initialPosition: 0, relations: [{ id: 11, pinIndex: 1, positionOffsetOnMove: -1 }] },
+                { id: 2, initialPosition: 0, relations: [{ id: 21, pinIndex: 2, positionOffsetOnMove: 1 }, { id: 22, pinIndex: 4, positionOffsetOnMove: 1 }] },
+                { id: 3, initialPosition: 2, relations: [{ id: 31, pinIndex: 1, positionOffsetOnMove: 1 }] },
+                { id: 4, initialPosition: 0, relations: [{ id: 41, pinIndex: 1, positionOffsetOnMove: -1 }] },
+                { id: 5, initialPosition: 6, relations: [{ id: 61, pinIndex: 3, positionOffsetOnMove: -1 }] }
+            ];
+            document.getElementById('targetPosition').value = '3';
+            renderPins();
+        }
+
+        function clearAll() {
+            pins = [];
+            document.getElementById('targetPosition').value = '3';
+            document.getElementById('resultPanel').style.display = 'none';
+            renderPins();
+        }
+
+        function getPinsForSolver() {
+            return pins.map((pin, pinIndex) => ({
+                initialPosition: pin.initialPosition,
+                relations: pin.relations.map(rel => ({
+                    pinIndex: rel.pinIndex,
+                    positionOffsetOnMove: rel.positionOffsetOnMove
+                }))
+            }));
+        }
+
+        function solveLock() {
+            if (pins.length === 0) {
+                alert('Please add at least one pin');
+                return;
+            }
+
+            const targetPosition = parseInt(document.getElementById('targetPosition').value);
+            const resultPanel = document.getElementById('resultPanel');
+            const resultContent = document.getElementById('resultContent');
+
+            resultPanel.style.display = 'block';
+            resultContent.innerHTML = '<div class="loading"><div class="spinner"></div><span>Computing solution...</span></div>';
+
+            setTimeout(() => {
+                try {
+                    const solverPins = getPinsForSolver();
+                    const solver = new LockSolver(solverPins, targetPosition);
+                    const result = solver.solve();
+
+                    if (!result.found) {
+                        resultContent.innerHTML = `
+                            <div class="error-message">
+                                <strong>No solution found</strong><br>
+                                States explored: ${result.statesExplored.toLocaleString()}
+                            </div>
+                        `;
+                    } else {
+                        let currentPlayerPosition = 0
+                        let solutionString = ''
+                        const stepsHtml = result.moves.map((move, i) => {
+                            const direction = move.delta > 0 ? 'A ' : 'D ';
+                            while (currentPlayerPosition < move.pin) {
+                                solutionString += "W "
+                                currentPlayerPosition++
+                            }
+                            while (currentPlayerPosition > move.pin) {
+                                solutionString += "S "
+                                currentPlayerPosition--
+                            }
+                            solutionString += direction
+                            return `
+                                <div class="step">
+                                    <span class="step-number">${i + 1}.</span>
+                                    Pin <span class="step-pin">${move.pin}</span>
+                                    ${direction}
+                                    <span class="step-arrow">→</span>
+                                    <span class="state-array">[${move.toState.join(', ')}]</span>
+                                </div>
+                            `;
+                        }).join('');
+
+
+                        resultContent.innerHTML = `
+                            <div class="success-message">
+                                ✓ Solution found in <strong>${result.moves.length}</strong> moves <br/><strong>${solutionString}</strong>
+                            </div>
+                            <div class="steps-container">
+                                ${stepsHtml}
+                            </div>
+                            <div class="stats">
+                                <div class="stat">
+                                    <div class="stat-value">${result.moves.length}</div>
+                                    <div class="stat-label">Moves</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">${result.statesExplored.toLocaleString()}</div>
+                                    <div class="stat-label">States</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    resultContent.innerHTML = `
+                        <div class="error-message">
+                            <strong>Error</strong><br>
+                            ${error.message}
+                        </div>
+                    `;
+                }
+            }, 300);
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            renderPins();
+        });
+    </script>
+</body>
+</html>
