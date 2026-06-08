@@ -983,12 +983,12 @@ function renderPins() {
             <div class="pin-track">
                 <div class="pin-slots" style="position:relative;">
                     ${slots.join('')}
-                    <div class="pin-marker" style="top:calc(${markerTopPct}% - 2px + ${pin.initialPosition === 6 ? 4 : pin.initialPosition === 0 ? -4 : 0}px)"></div>
+                    <div class="pin-marker" style="top:calc(${markerTopPct}% - 2px + ${pin.initialPosition === 6 ? -4 : pin.initialPosition === 0 ? 4 : 0}px)"></div>
                 </div>
             </div>
             <div class="pin-bottom-controls">
-                <button class="pin-btn" onclick="event.stopPropagation();updatePinPos(${pin.id}, 1)" title="+1">▲</button>
-                <button class="pin-btn" onclick="event.stopPropagation();updatePinPos(${pin.id}, -1)" title="-1">▼</button>
+                <button class="pin-btn" onclick="event.stopPropagation();updatePinPos(${pin.id}, -1)" title="-1">▲</button>
+                <button class="pin-btn" onclick="event.stopPropagation();updatePinPos(${pin.id}, 1)" title="+1">▼</button>
             </div>
         </div>`;
     }).join('');
@@ -1135,7 +1135,7 @@ function solveLock() {
                 const navKeys = [];
                 while (curPin < move.pin) { keys.push('w'); navKeys.push('w'); curPin++; }
                 while (curPin > move.pin) { keys.push('s'); navKeys.push('s'); curPin--; }
-                const actionKey = move.delta > 0 ? 'd' : 'a';
+                const actionKey = move.delta > 0 ? 'a' : 'd';
                 keys.push(actionKey);
                 steps.push({ navKeys, actionKey, move });
             }
