@@ -979,7 +979,7 @@ function renderPins() {
         const markerTopPct = ((pin.initialPosition) / 6) * 100;
 
         return `<div class="pin-column${isSelected ? ' selected' : ''}" onclick="selectPin(${i})">
-            <div class="pin-label">PIN ${i}</div>
+            <div class="pin-label">PIN ${i+1}</div>
             <div class="pin-track">
                 <div class="pin-slots" style="position:relative;">
                     ${slots.join('')}
@@ -1063,7 +1063,7 @@ function renderEditor() {
 
     editor.style.display = 'block';
     const pin = pins[selectedPin];
-    title.textContent = `Pin ${selectedPin} — Dependencies`;
+    title.textContent = `Pin ${selectedPin+1} — Dependencies`;
 
     if (!pin.relations.length) {
         depList.innerHTML = `<div style="color:var(--text-dim);font-style:italic;font-size:0.85em;">No dependencies. When this pin moves, nothing else is affected.</div>`;
@@ -1074,7 +1074,7 @@ function renderEditor() {
         <div class="dep-row">
             <span class="dep-label">moves</span>
             <select onchange="updateDepPin(${rel.id}, this.value)">
-                ${pins.map((p, i) => `<option value="${i}" ${i === rel.pinIndex ? 'selected' : ''}>Pin ${i}</option>`).join('')}
+                ${pins.map((p, i) => `<option value="${i}" ${i === rel.pinIndex ? 'selected' : ''}>Pin ${i+1}</option>`).join('')}
             </select>
             <span class="dep-label">by</span>
             <input type="number" value="${rel.positionOffsetOnMove}" min="-6" max="6"
@@ -1154,7 +1154,7 @@ function solveLock() {
                 return `<div class="step-item" style="animation-delay:${i*0.03}s">
                     <span class="step-num">${i+1}.</span>
                     <div class="step-keys">${navChips}${actChip}</div>
-                    <span class="step-desc">pin ${s.move.pin} ${dir}</span>
+                    <span class="step-desc">pin ${s.move.pin+1} ${dir}</span>
                     <span class="step-state">[${s.move.toState.join(',')}]</span>
                 </div>`;
             }).join('');
