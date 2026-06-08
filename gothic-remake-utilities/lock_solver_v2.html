@@ -933,6 +933,7 @@ function updateDepPin(relId, val) {
     if (selectedPin === null) return;
     const r = pins[selectedPin].relations.find(x => x.id === relId);
     if (r) r.pinIndex = parseInt(val);
+    renderAll()
 }
 
 function updateDepOffset(relId, val) {
