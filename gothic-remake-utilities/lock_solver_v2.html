@@ -963,19 +963,20 @@ function renderPins() {
         area.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-style:italic;font-size:0.9em;padding:20px;">No pins — click "Add Pin"</div>`;
         return;
     }
+    console.log(pins)
     area.innerHTML = pins.map((pin, i) => {
         const isSelected = selectedPin === i;
         const slots = [];
-        for (let pos = 6; pos >= 0; pos--) {
+        for (let pos = 0; pos <= 6; pos++) {
             const isTarget = pos === parseInt(document.getElementById('targetPosition')?.value ?? 3);
             slots.push(`<div class="pin-slot${isTarget ? ' target' : ''}">
                 <span class="slot-number">${pos}</span>
             </div>`);
         }
-        // marker position: pos 6 is top, pos 0 is bottom
+        // marker position: pos 0 is top, pos 6 is bottom
         // slot height = 30px, 7 slots total
         // pos 6 → 0% from top inside slots, pos 0 → 100%
-        const markerTopPct = ((6 - pin.initialPosition) / 6) * 100;
+        const markerTopPct = ((pin.initialPosition) / 6) * 100;
 
         return `<div class="pin-column${isSelected ? ' selected' : ''}" onclick="selectPin(${i})">
             <div class="pin-label">PIN ${i}</div>
