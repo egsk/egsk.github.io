@@ -963,7 +963,6 @@ function renderPins() {
         area.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-style:italic;font-size:0.9em;padding:20px;">No pins — click "Add Pin"</div>`;
         return;
     }
-    console.log(pins)
     area.innerHTML = pins.map((pin, i) => {
         const isSelected = selectedPin === i;
         const slots = [];
@@ -1015,11 +1014,12 @@ function renderArrows() {
         });
 
         const paths = [];
-        pins.forEach((pin, fromIdx) => {
-            pin.relations.forEach(rel => {
+//    pins.forEach((pin, fromIdx) => {
+//          pin.relations.forEach(rel => {
+            pins[selectedPin].relations.forEach(rel => {
                 const toIdx = rel.pinIndex;
                 if (toIdx < 0 || toIdx >= pins.length) return;
-                const x1 = colCenters[fromIdx];
+                const x1 = colCenters[selectedPin];
                 const x2 = colCenters[toIdx];
                 const y1 = 10;
                 const y2 = 10;
@@ -1034,7 +1034,7 @@ function renderArrows() {
                     <text x="${(x1+x2)/2}" y="${midY + 12}" text-anchor="middle" fill="${color}" font-size="9" font-family="Cinzel,serif">${offset > 0 ? '+' : ''}${offset}</text>
                 `);
             });
-        });
+//      });
 
         svg.innerHTML = `
             <defs>
